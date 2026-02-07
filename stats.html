@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HabitFlow | Statistics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="prefetch" href="dashboard.html">
+  <link rel="prefetch" href="settings.html">
+</head>
+<body class="app-page">
+  <div class="page-bg"></div>
+  <div id="loadingOverlay" class="loading-overlay hidden">
+    <div class="loader-ring"></div>
+    <p>Preparing your statistics...</p>
+  </div>
+
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <span class="brand-pill">HabitFlow</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" data-nav="dashboard">Dashboard</a>
+        <a href="stats.html" data-nav="stats">Statistics</a>
+        <a href="settings.html" data-nav="settings">Settings</a>
+      </nav>
+    </aside>
+
+    <main class="content">
+      <header class="content-header">
+        <div>
+          <p class="muted">Performance overview</p>
+          <h1>Your Habit Statistics</h1>
+        </div>
+      </header>
+
+      <section class="stats-grid">
+        <article class="card stat-card">
+          <p class="muted">Total Habits Completed</p>
+          <h2 id="totalCompletedStat">0</h2>
+        </article>
+        <article class="card stat-card">
+          <p class="muted">Longest Streak</p>
+          <h2 id="longestStreakStat">0 days</h2>
+        </article>
+        <article class="card stat-card">
+          <p class="muted">Completion Percentage (30 days)</p>
+          <h2 id="completionRateStat">0%</h2>
+        </article>
+      </section>
+
+      <section class="card chart-section">
+        <div class="section-head">
+          <h3>Weekly Completion Chart</h3>
+        </div>
+        <div id="weeklyChart" class="weekly-chart"></div>
+      </section>
+    </main>
+  </div>
+
+  <nav class="bottom-nav" aria-label="Bottom Navigation">
+    <a href="dashboard.html" data-nav="dashboard">Dashboard</a>
+    <a href="stats.html" data-nav="stats">Stats</a>
+    <a href="settings.html" data-nav="settings">Settings</a>
+  </nav>
+
+  <div id="toastRoot" class="toast-root"></div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/stats.js"></script>
+</body>
+</html>

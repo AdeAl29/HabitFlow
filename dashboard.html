@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HabitFlow | Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="prefetch" href="stats.html">
+  <link rel="prefetch" href="settings.html">
+</head>
+<body class="app-page">
+  <div class="page-bg"></div>
+  <div id="loadingOverlay" class="loading-overlay hidden">
+    <div class="loader-ring"></div>
+    <p>Syncing your habits...</p>
+  </div>
+
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <span class="brand-pill">HabitFlow</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" data-nav="dashboard">Dashboard</a>
+        <a href="stats.html" data-nav="stats">Statistics</a>
+        <a href="settings.html" data-nav="settings">Settings</a>
+      </nav>
+    </aside>
+
+    <main class="content">
+      <header class="content-header">
+        <div>
+          <p class="muted">Good to see you,</p>
+          <h1 id="greeting">User</h1>
+        </div>
+        <button id="openHabitModalBtn" class="btn btn-primary">+ Add Habit</button>
+      </header>
+
+      <section class="stats-grid">
+        <article class="card stat-card">
+          <p class="muted">Today Completion</p>
+          <h2 id="dailyProgressLabel">0%</h2>
+          <div class="progress-track">
+            <div id="dailyProgressBar" class="progress-fill"></div>
+          </div>
+        </article>
+        <article class="card stat-card">
+          <p class="muted">Best Current Streak</p>
+          <h2 id="bestStreakLabel">0 days</h2>
+        </article>
+        <article class="card stat-card">
+          <p class="muted">Weekly Summary</p>
+          <h2 id="weeklySummaryLabel">0 / 0</h2>
+        </article>
+      </section>
+
+      <section class="card habit-section">
+        <div class="section-head">
+          <h3>Daily Habit Checklist</h3>
+        </div>
+        <div id="habitList" class="habit-list"></div>
+        <p id="emptyState" class="empty-state hidden">No habits yet. Add your first habit to start your streak.</p>
+      </section>
+
+      <section class="insight-grid">
+        <article id="calendarCard" class="card">
+          <div class="section-head">
+            <h3>Habit Calendar</h3>
+            <div class="calendar-nav">
+              <button id="calendarPrevBtn" class="icon-btn" type="button" title="Previous month">&lt;</button>
+              <span id="calendarMonthLabel" class="calendar-month-label">Month</span>
+              <button id="calendarNextBtn" class="icon-btn" type="button" title="Next month">&gt;</button>
+            </div>
+          </div>
+          <div id="calendarWeekdayHeader" class="calendar-weekdays"></div>
+          <div id="habitCalendar" class="habit-calendar"></div>
+        </article>
+
+        <article id="achievementCard" class="card">
+          <div class="section-head">
+            <h3>Achievement Badges</h3>
+          </div>
+          <div id="achievementList" class="achievement-list"></div>
+        </article>
+
+        <article id="quoteCard" class="card quote-card">
+          <div class="section-head">
+            <h3>Motivational Quote</h3>
+            <button id="newQuoteBtn" class="btn btn-ghost btn-small" type="button">New Quote</button>
+          </div>
+          <p id="quoteText" class="quote-text"></p>
+          <p id="quoteAuthor" class="quote-author"></p>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <nav class="bottom-nav" aria-label="Bottom Navigation">
+    <a href="dashboard.html" data-nav="dashboard">Dashboard</a>
+    <a href="stats.html" data-nav="stats">Stats</a>
+    <a href="settings.html" data-nav="settings">Settings</a>
+  </nav>
+
+  <div id="habitModal" class="modal hidden">
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-panel">
+      <h3 id="habitModalTitle">Add Habit</h3>
+      <form id="habitForm">
+        <input type="hidden" id="habitIdField">
+        <label>
+          Habit name
+          <input type="text" id="habitNameField" required minlength="2" maxlength="60" placeholder="e.g. Read 20 minutes">
+        </label>
+        <label class="toggle-row">
+          Enable reminder
+          <input type="checkbox" id="habitReminderField">
+        </label>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" data-close-modal>Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Habit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="reminderPopup" class="reminder-popup hidden">
+    <h4>Reminder</h4>
+    <p id="reminderText">Time to complete your habit.</p>
+    <button id="dismissReminderBtn" class="btn btn-primary btn-small">Got it</button>
+  </div>
+
+  <div id="toastRoot" class="toast-root"></div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/habit.js"></script>
+</body>
+</html>

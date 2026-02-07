@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HabitFlow | Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="auth-page">
+  <div class="page-bg"></div>
+  <div id="loadingOverlay" class="loading-overlay hidden">
+    <div class="loader-ring"></div>
+    <p>Loading HabitFlow...</p>
+  </div>
+
+  <main class="auth-shell">
+    <section class="auth-brand">
+      <span class="brand-pill">HabitFlow</span>
+      <h1>Track habits, build momentum.</h1>
+      <p>Build consistency with a calm daily workflow and clear progress insights.</p>
+      <ul class="auth-highlights">
+        <li>Daily checklist with streak tracking</li>
+        <li>Weekly progress visualization</li>
+        <li>Lightweight reminders and analytics</li>
+      </ul>
+    </section>
+
+    <section class="auth-card">
+      <div class="auth-tabs">
+        <button class="tab-btn active" data-tab="loginForm">Login</button>
+        <button class="tab-btn" data-tab="registerForm">Register</button>
+      </div>
+
+      <form id="loginForm" class="auth-form active" autocomplete="off">
+        <h2>Welcome back</h2>
+        <label>
+          Username
+          <input type="text" id="loginUsername" required minlength="3" maxlength="24">
+        </label>
+        <label>
+          Password
+          <input type="password" id="loginPassword" required minlength="4" maxlength="32">
+        </label>
+        <button type="submit" class="btn btn-primary btn-block">Login</button>
+      </form>
+
+      <form id="registerForm" class="auth-form" autocomplete="off">
+        <h2>Create account</h2>
+        <label>
+          Username
+          <input type="text" id="registerUsername" required minlength="3" maxlength="24">
+        </label>
+        <label>
+          Password
+          <input type="password" id="registerPassword" required minlength="4" maxlength="32">
+        </label>
+        <button type="submit" class="btn btn-primary btn-block">Create account</button>
+      </form>
+    </section>
+  </main>
+
+  <div id="toastRoot" class="toast-root"></div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/auth.js"></script>
+</body>
+</html>
