@@ -1,6 +1,8 @@
 (function () {
   var reminderTimer = null;
   var THEME_KEY = "habitflow_theme";
+  var deferredInstallPrompt = null;
+  var pwaInitialized = false;
 
   function showToast(message, type) {
     var root = document.getElementById("toastRoot");
@@ -86,7 +88,16 @@
     var mode = theme === "dark" ? "dark" : "light";
     document.documentElement.setAttribute("data-theme", mode);
     localStorage.setItem(THEME_KEY, mode);
+    updateThemeColor(mode);
     updateThemeButtons(mode);
+  }
+
+  function updateThemeColor(mode) {
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (!meta) {
+      return;
+    }
+    meta.setAttribute("content", mode === "dark" ? "#121626" : "#6d79ff");
   }
 
   function toggleTheme() {
@@ -117,6 +128,119 @@
   function initTheme() {
     applyTheme(getSavedTheme());
     bindThemeToggleButtons();
+  }
+
+  function registerServiceWorker() {
+    if (!("serviceWorker" in navigator)) {
+      return;
+    }
+    var isSecure = window.location.protocol === "https:" || window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+    if (!isSecure) {
+      return;
+    }
+    navigator.serviceWorker.register("sw.js").catch(function () {
+      return null;
+    });
+  }
+
+  function isStandaloneMode() {
+    return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+  }
+
+  function getInstallButtons() {
+    var byDataAttr = Array.prototype.slice.call(document.querySelectorAll("[data-install-app]"));
+    var byId = document.getElementById("installAppBtn");
+    if (byId && byDataAttr.indexOf(byId) === -1) {
+      byDataAttr.push(byId);
+    }
+    return byDataAttr;
+  }
+
+  function updateInstallButtons() {
+    var installed = isStandaloneMode();
+    var canPrompt = Boolean(deferredInstallPrompt);
+    var buttons = getInstallButtons();
+
+    buttons.forEach(function (button) {
+      if (installed) {
+        button.textContent = "App Installed";
+        button.disabled = true;
+        return;
+      }
+      button.disabled = false;
+      button.textContent = canPrompt ? "Install App" : "Add to Home Screen";
+    });
+  }
+
+  function showManualInstallHint() {
+    var ua = (window.navigator.userAgent || "").toLowerCase();
+    var isIOS = /iphone|ipad|ipod/.test(ua);
+    if (isIOS) {
+      showToast("iPhone: buka Share lalu pilih Add to Home Screen.", "info");
+      return;
+    }
+    showToast("Buka menu browser lalu pilih Install app / Add to Home Screen.", "info");
+  }
+
+  function promptInstall() {
+    if (isStandaloneMode()) {
+      showToast("App sudah terpasang.", "info");
+      updateInstallButtons();
+      return;
+    }
+
+    if (!deferredInstallPrompt) {
+      showManualInstallHint();
+      return;
+    }
+
+    var event = deferredInstallPrompt;
+    deferredInstallPrompt = null;
+    event.prompt();
+    event.userChoice.then(function (choice) {
+      if (choice && choice.outcome === "accepted") {
+        showToast("Installing HabitFlow...", "success");
+      }
+      updateInstallButtons();
+    });
+  }
+
+  function bindInstallButton(buttonId) {
+    var button = document.getElementById(buttonId);
+    if (!button) {
+      return;
+    }
+    if (button.dataset.boundInstall === "true") {
+      updateInstallButtons();
+      return;
+    }
+    button.dataset.boundInstall = "true";
+    button.addEventListener("click", promptInstall);
+    updateInstallButtons();
+  }
+
+  function setupInstallPromptListeners() {
+    window.addEventListener("beforeinstallprompt", function (event) {
+      event.preventDefault();
+      deferredInstallPrompt = event;
+      updateInstallButtons();
+    });
+
+    window.addEventListener("appinstalled", function () {
+      deferredInstallPrompt = null;
+      updateInstallButtons();
+      showToast("HabitFlow installed.", "success");
+    });
+  }
+
+  function initPWA() {
+    if (pwaInitialized) {
+      return;
+    }
+    pwaInitialized = true;
+    registerServiceWorker();
+    setupInstallPromptListeners();
+    updateInstallButtons();
   }
 
   function openModal(id) {
@@ -205,6 +329,9 @@
     getSavedTheme: getSavedTheme,
     applyTheme: applyTheme,
     toggleTheme: toggleTheme,
+    initPWA: initPWA,
+    bindInstallButton: bindInstallButton,
+    promptInstall: promptInstall,
     openModal: openModal,
     closeModal: closeModal,
     bindModalCloseHandlers: bindModalCloseHandlers,

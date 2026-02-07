@@ -324,6 +324,7 @@
 
     UI.markActiveNav("settings");
     UI.bindLogout();
+    UI.bindInstallButton("installAppBtn");
     bindFormEvents();
     bindExportButtons();
     bindDangerActions();

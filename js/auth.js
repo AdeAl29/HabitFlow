@@ -117,6 +117,7 @@
   }
 
   function init() {
+    UI.initPWA();
     UI.initTheme();
     var page = getPageName();
     if (page === "index.html" || page === "") {
