@@ -1,4 +1,4 @@
-const CACHE_VERSION = "habitflow-v2";
+const CACHE_VERSION = "habitflow-v3";
 const STATIC_CACHE = "habitflow-static-" + CACHE_VERSION;
 const RUNTIME_CACHE = "habitflow-runtime-" + CACHE_VERSION;
 
@@ -16,8 +16,9 @@ const APP_SHELL = [
   "./js/habit.js",
   "./js/stats.js",
   "./js/settings.js",
-  "./assets/pwa/icon-192.svg",
-  "./assets/pwa/icon-512.svg"
+  "./assets/images/icon.png",
+  "./assets/pwa/icon-192.png",
+  "./assets/pwa/icon-512.png"
 ];
 
 self.addEventListener("install", (event) => {
