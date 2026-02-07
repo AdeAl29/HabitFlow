@@ -1,8 +1,5 @@
-const CACHE_VERSION = "habitflow-v3";
-const STATIC_CACHE = "habitflow-static-" + CACHE_VERSION;
-const RUNTIME_CACHE = "habitflow-runtime-" + CACHE_VERSION;
-
-const APP_SHELL = [
+const CACHE_NAME = "habitflow-v4-offline";
+const ASSETS_TO_CACHE = [
   "./",
   "./index.html",
   "./dashboard.html",
@@ -21,65 +18,78 @@ const APP_SHELL = [
   "./assets/pwa/icon-512.png"
 ];
 
+// 1) Install service worker + cache asset inti
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(STATIC_CACHE).then((cache) => cache.addAll(APP_SHELL))
-  );
   self.skipWaiting();
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE))
+  );
 });
 
+// 2) Activate + bersihkan cache lama
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(
-        keys
-          .filter((key) => key !== STATIC_CACHE && key !== RUNTIME_CACHE)
-          .map((key) => caches.delete(key))
+    caches
+      .keys()
+      .then((keyList) =>
+        Promise.all(
+          keyList.map((key) => {
+            if (key !== CACHE_NAME) {
+              return caches.delete(key);
+            }
+            return Promise.resolve();
+          })
+        )
       )
-    )
+      .then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
+// 3) Fetch strategy: Cache First, Network Fallback
 self.addEventListener("fetch", (event) => {
-  const request = event.request;
-  if (request.method !== "GET") {
+  const req = event.request;
+  if (req.method !== "GET") {
     return;
   }
 
-  const url = new URL(request.url);
-  if (url.origin !== self.location.origin) {
-    return;
-  }
-
-  if (request.mode === "navigate") {
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          const copy = response.clone();
-          caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, copy));
-          return response;
-        })
-        .catch(async () => {
-          const cachedPage = await caches.match(request);
-          return cachedPage || caches.match("./index.html");
-        })
-    );
+  // Hindari gangguan streaming/range media
+  const isMedia = req.destination === "audio" || req.destination === "video";
+  const isRange = req.headers.has("range");
+  if (isMedia || isRange) {
+    event.respondWith(fetch(req));
     return;
   }
 
   event.respondWith(
-    caches.match(request).then((cached) => {
-      const network = fetch(request)
-        .then((response) => {
-          if (response && response.status === 200) {
-            const copy = response.clone();
-            caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, copy));
+    caches.match(req).then((cachedRes) => {
+      if (cachedRes) {
+        return cachedRes;
+      }
+
+      return fetch(req)
+        .then((networkRes) => {
+          if (!networkRes || networkRes.status !== 200 || networkRes.type === "error") {
+            return networkRes;
           }
-          return response;
+
+          // Simpan request same-origin agar makin cepat saat akses ulang
+          const reqUrl = new URL(req.url);
+          if (reqUrl.origin === self.location.origin) {
+            const copy = networkRes.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
+          }
+
+          return networkRes;
         })
-        .catch(() => cached);
-      return cached || network;
+        .catch(() => {
+          if (req.mode === "navigate") {
+            return caches.match("./index.html");
+          }
+          return new Response("Offline", {
+            status: 503,
+            statusText: "Service Unavailable"
+          });
+        });
     })
   );
 });
